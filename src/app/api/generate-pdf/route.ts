@@ -17,6 +17,8 @@ interface TeamAllocation {
   teamMembers: TeamMember[];
   totalMembers: number;
   totalHoursPerDay: number;
+  companyName : string;
+  managerName : string;
 }
 
 interface ApiResponse {
@@ -28,7 +30,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const teamData: TeamAllocation = await request.json()
     
-    if (!teamData || !teamData.project || !teamData.teamMembers || !Array.isArray(teamData.teamMembers)) {
+    if (!teamData || !teamData.project || !teamData.teamMembers || !Array.isArray(teamData.teamMembers) || !teamData.companyName || !teamData.managerName) {
       return Response.json({ error: 'Invalid team data structure' } as ApiResponse, {
         status: 400,
       });
@@ -45,7 +47,7 @@ export async function POST(request: Request): Promise<Response> {
     const textColor = '#2b2b28';
     doc.setFontSize(28);
     doc.setTextColor(primaryColor);
-    doc.text('Team Allocation Report', 20, 25);
+    doc.text(`Team Allocation Report - ${teamData.companyName}`, 20, 25);
     
     doc.setFontSize(16);
     doc.setTextColor(textColor);
@@ -59,14 +61,21 @@ export async function POST(request: Request): Promise<Response> {
     doc.setTextColor(primaryColor);
     doc.text('Project Details', 20, 60);
     
+
     doc.setFontSize(12);
     doc.setTextColor(textColor);
-    doc.text('Task Description:', 20, 70);
+    doc.text('Team Manager:', 20, 70);
+    const teamManager: string = teamData.managerName || 'No Manager Name provided provided';
+    const splitManager = doc.splitTextToSize(teamManager, 170);
+    doc.text(splitManager, 20, 80);
+    doc.setFontSize(12);
+    doc.setTextColor(textColor);
+    doc.text('Task Description:', 20, 90);
     const taskText: string = teamData.project.task || 'No task description provided';
     const splitTask = doc.splitTextToSize(taskText, 170);
-    doc.text(splitTask, 20, 80);
+    doc.text(splitTask, 20, 100);
 
-    let currentY: number = 80 + (Array.isArray(splitTask) ? splitTask.length * 5 : 5) + 10;
+    let currentY: number = 100 + (Array.isArray(splitTask) ? splitTask.length * 5 : 5) + 10;
     doc.setFontSize(16);
     doc.setTextColor(primaryColor);
     doc.text('Project Summary', 20, currentY);

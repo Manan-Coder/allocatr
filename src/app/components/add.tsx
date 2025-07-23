@@ -23,6 +23,8 @@ type TeamAllocation = {
     }[]
     totalMembers: number
     totalHoursPerDay: number
+    companyName : string
+    managerName : string
 }
 
 export default function TeamTable() {
@@ -32,6 +34,8 @@ export default function TeamTable() {
         {name:"", speciality: "", hours:""}
     ])
     const [textareaValue, setTextareaValue] = useState("")
+    const [companyName, setCompanyName] = useState("")
+    const [managerName, setManagerName] = useState("")
     const [submissionResult, setSubmissionResult] = useState<TeamAllocation | null>(null)
 
     const addRow = () => {
@@ -80,7 +84,9 @@ export default function TeamTable() {
             totalMembers: validMembers.length,
             totalHoursPerDay: validMembers.reduce((total, member) => {
                 return total + (member.hours === "" ? 0 : Number(member.hours))
-            }, 0)
+            }, 0),
+            companyName,
+            managerName
         }
         return teamAllocation
     }
@@ -225,7 +231,14 @@ const handlePreviewPdf = () => {
                         </button>
                     </div>
                 </div>
-
+                <div className="space-y-4">
+                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Company's Name</h2>
+                    <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Allocatr" className="resize-none font-sans bg-[#30302e] border-white/10 text-[#c2c0b6]"/>
+                </div>
+                                <div className="space-y-4">
+                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Manager's Name</h2>
+                    <Input value={managerName} onChange={(e) => setManagerName(e.target.value)} placeholder="John Doe" className="resize-none font-sans bg-[#30302e] border-white/10 text-[#c2c0b6]"/>
+                </div>
                 <div className="space-y-4">
                     <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Tasks</h2>
                     <Textarea value={textareaValue} onChange={(e) => setTextareaValue(e.target.value)} placeholder="Type in the tasks and the time frame you want them to be done in." className="resize-none h-32 font-sans bg-[#30302e] border-white/10 text-[#c2c0b6]"/>
