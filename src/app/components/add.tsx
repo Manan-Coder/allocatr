@@ -84,12 +84,82 @@ export default function TeamTable() {
         }
         return teamAllocation
     }
-    
-    const handleSubmit = () => {
+    const [pdfBlob, setPdfBlob] = useState<Blob | null>(null)
+const [isGenerating, setIsGenerating] = useState(false)
+const [isDownloading, setIsDownloading] = useState(false)
+
+const handleSubmit = async () => {
+    try {
+        setIsGenerating(true)
         const teamData = createTeamData()
         setSubmissionResult(teamData)
         console.log("Team Allocation Data:", teamData)
+        
+        const response = await fetch('/api/generate-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(teamData)
+        })
+        
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to generate PDF')
+        }
+        
+        const blob = await response.blob()
+        setPdfBlob(blob)
+        
+        console.log('PDF generated successfully!')
+        alert("pdf generation successful!")
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+        alert('Failed to generate PDF: ' + errorMessage)
+    } finally {
+        setIsGenerating(false)
     }
+}
+const handleDownloadPdf = async () => {
+    if (!pdfBlob) {
+        alert('No PDF available. Please generate the allocation first.')
+        return
+    }
+    
+    try {
+        setIsDownloading(true)
+        
+        const url = window.URL.createObjectURL(pdfBlob)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = `team-allocation-${Date.now()}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        
+        console.log('PDF downloaded successfully!')
+        
+    } catch (error) {
+        console.error('Error downloading PDF:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+        alert('Failed to download PDF: ' + errorMessage)
+    } finally {
+        setIsDownloading(false)
+    }
+}
+const handlePreviewPdf = () => {
+    if (!pdfBlob) {
+        alert('No PDF available. Please generate the allocation first.')
+        return
+    }
+    
+    const url = window.URL.createObjectURL(pdfBlob)
+    window.open(url)
+}
 
     const validateForm = () => {
         const hasValidMembers = rows.some(row => 
@@ -196,6 +266,33 @@ export default function TeamTable() {
                         Get Team Allocation Roadmap
                     </button>
                 </div>
+                        <button 
+            onClick={handleSubmit}
+            disabled={isGenerating}
+            className="submit-btn"
+        >
+        </button>
+        
+        {pdfBlob && (
+            <div className="pdf-actions flex justify-center gap-8 h-12">
+                <button 
+                    onClick={handleDownloadPdf}
+                    disabled={isDownloading}
+                    className="download-btn cursor-pointer bg-[#e26e47] hover:bg-[#d4603f] rounded-lg flex justify-center items-center p-4"
+                >
+                    <p>
+                    {isDownloading ? 'Downloading...' : 'Download PDF'}
+                    </p>
+                </button>
+                
+                <button 
+                    onClick={handlePreviewPdf}
+                    className="preview-btn cursor-pointer bg-[#e26e47] hover:bg-[#d4603f] rounded-lg flex justify-center items-center p-4"
+                >
+                   <p>Preview PDF</p> 
+                </button>
+            </div>
+        )}
             </div>
         </div>
     )
