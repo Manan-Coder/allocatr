@@ -232,11 +232,11 @@ const handlePreviewPdf = () => {
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Company's Name</h2>
+                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Company&apos;s Name</h2>
                     <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Allocatr" className="resize-none font-sans bg-[#30302e] border-white/10 text-[#c2c0b6]"/>
                 </div>
                                 <div className="space-y-4">
-                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Manager's Name</h2>
+                    <h2 className="text-2xl font-sans text-[#c2c0b6] mb-4">Manager&apos;s Name</h2>
                     <Input value={managerName} onChange={(e) => setManagerName(e.target.value)} placeholder="John Doe" className="resize-none font-sans bg-[#30302e] border-white/10 text-[#c2c0b6]"/>
                 </div>
                 <div className="space-y-4">
